@@ -931,18 +931,630 @@ Sibling BLACK + Far RED Child
 
 These cases eventually eliminate Double Black and restore all Red-Black properties.
 
-'''
-Conceptual Questions
-Why is deletion harder than insertion?
-What is Double Black?
-Why does deleting a RED node usually require no fix?
-Why is sibling more important than uncle during deletion?
-Which deletion case actually resolves the problem?
-Why can deletion propagate upward?
-Coding Exercises
-Draw all four sibling cases.
-Trace deletion manually on paper.
-Identify near child vs far child.
-Explain Double Black to someone without using code.
-Simulate deletion from a Red-Black Tree step by step.
-'''
+
+# Red-Black Tree Deletion — Conceptual Questions & Practice Exercises
+
+---
+
+# Conceptual Questions
+
+## 1. Why is Deletion Harder than Insertion?
+
+Deletion is harder because:
+
+### During Insertion
+- A newly inserted node is always RED.
+- No black node is removed.
+- Black Height usually remains unchanged.
+- We mainly deal with RED-RED violations.
+
+### During Deletion
+- A BLACK node may be removed.
+- Removing a BLACK node can decrease Black Height on one path.
+- This violates Red-Black Tree properties.
+- We must restore balance while preserving Black Height.
+
+### Example
+
+Before deletion:
+
+```text
+      20(B)
+     /     \
+  10(B)   30(B)
+```
+
+Black Height of both paths = 2
+
+Delete 10(B):
+
+```text
+      20(B)
+          \
+         30(B)
+```
+
+Left path has fewer black nodes than right path.
+
+Black Height property breaks.
+
+This is why deletion is more complicated.
+
+---
+
+## 2. What is Double Black?
+
+Double Black is a conceptual marker used during deletion.
+
+It represents:
+
+```text
+Missing Black Node + Existing Black Node
+```
+
+or
+
+```text
+BLACK + BLACK = DOUBLE BLACK
+```
+
+It is NOT an actual color.
+
+We use it temporarily to indicate:
+
+> "This subtree has one extra black deficiency."
+
+### Example
+
+Delete black leaf:
+
+```text
+      20(B)
+     /
+   10(B)
+```
+
+Delete 10(B)
+
+```text
+      20(B)
+     /
+   NULL(DB)
+```
+
+NULL becomes Double Black.
+
+Now we must eliminate this Double Black.
+
+---
+
+## 3. Why Does Deleting a RED Node Usually Require No Fix?
+
+Because RED nodes do not contribute to Black Height.
+
+### Example
+
+Before:
+
+```text
+      20(B)
+     /
+   10(R)
+```
+
+Black count:
+
+```text
+20(B)
+```
+
+Delete 10(R)
+
+```text
+      20(B)
+```
+
+Black count remains unchanged.
+
+No Red-Black property is violated.
+
+Therefore:
+
+```text
+Deleting RED node
+=
+No balancing needed
+```
+
+---
+
+## 4. Why is Sibling More Important than Uncle During Deletion?
+
+### During Insertion
+
+We focus on:
+
+```text
+Parent
+Grandparent
+Uncle
+```
+
+because the violation is:
+
+```text
+RED parent + RED child
+```
+
+Uncle determines which insertion case occurs.
+
+---
+
+### During Deletion
+
+The problem is:
+
+```text
+DOUBLE BLACK
+```
+
+To remove Double Black, we need help from the nearby subtree.
+
+That nearby subtree is the:
+
+```text
+Sibling
+```
+
+Sibling can:
+
+- Donate a black node
+- Rotate
+- Recolor
+
+Therefore deletion decisions depend almost entirely on sibling color and sibling's children.
+
+---
+
+## 5. Which Deletion Case Actually Resolves the Problem?
+
+### Case 4
+
+Sibling is BLACK and far child is RED.
+
+Example:
+
+```text
+        P(B)
+       /    \
+    DB      S(B)
+              \
+              R(R)
+```
+
+Perform:
+
+- Rotation
+- Recoloring
+
+Result:
+
+```text
+Double Black removed
+Black Height restored
+Algorithm stops
+```
+
+This is the only case that directly eliminates Double Black immediately.
+
+---
+
+## 6. Why Can Deletion Propagate Upward?
+
+Sometimes Double Black cannot be removed locally.
+
+### Example
+
+```text
+        P(B)
+       /    \
+     DB    S(B)
+          /   \
+       B      B
+```
+
+Sibling has:
+
+```text
+BLACK sibling
+BLACK near child
+BLACK far child
+```
+
+We recolor sibling RED:
+
+```text
+        P(B)
+       /    \
+     DB    S(R)
+```
+
+Now:
+
+```text
+Parent loses one black contribution
+```
+
+So Double Black moves upward:
+
+```text
+P becomes Double Black
+```
+
+This process may continue toward the root.
+
+Thus deletion can propagate upward multiple levels.
+
+---
+
+# Coding Exercises
+
+---
+
+## Exercise 1: Draw All Four Sibling Cases
+
+### Case 1 — Red Sibling
+
+```text
+        P(B)
+       /    \
+     DB     S(R)
+           /   \
+        B      B
+```
+
+---
+
+### Case 2 — Black Sibling, Both Children Black
+
+```text
+        P(?)
+       /    \
+     DB     S(B)
+           /   \
+        B      B
+```
+
+---
+
+### Case 3 — Black Sibling, Near Child Red
+
+```text
+        P(?)
+       /    \
+     DB     S(B)
+           /
+        R(R)
+```
+
+---
+
+### Case 4 — Black Sibling, Far Child Red
+
+```text
+        P(?)
+       /    \
+     DB     S(B)
+               \
+               R(R)
+```
+
+---
+
+## Exercise 2: Trace Deletion Manually
+
+Given:
+
+```text
+          20(B)
+         /     \
+      10(B)   30(B)
+```
+
+### Step 1
+
+Delete:
+
+```text
+10(B)
+```
+
+Result:
+
+```text
+          20(B)
+         /     \
+      DB      30(B)
+```
+
+---
+
+### Step 2
+
+Identify:
+
+```text
+Sibling = 30(B)
+```
+
+Sibling's children:
+
+```text
+BLACK
+BLACK
+```
+
+Case 2
+
+---
+
+### Step 3
+
+Recolor sibling:
+
+```text
+30(B) → 30(R)
+```
+
+Move Double Black upward.
+
+---
+
+### Step 4
+
+Root absorbs Double Black.
+
+Final:
+
+```text
+          20(B)
+                \
+                30(R)
+```
+
+---
+
+## Exercise 3: Identify Near Child vs Far Child
+
+Consider:
+
+```text
+        P
+       / \
+     DB   S
+         / \
+        A   B
+```
+
+### Near Child
+
+Closer to Double Black.
+
+```text
+A
+```
+
+---
+
+### Far Child
+
+Farther from Double Black.
+
+```text
+B
+```
+
+---
+
+### Opposite Side Example
+
+```text
+        P
+       / \
+      S   DB
+     / \
+    A   B
+```
+
+Near Child:
+
+```text
+B
+```
+
+Far Child:
+
+```text
+A
+```
+
+---
+
+## Exercise 4: Explain Double Black Without Using Code
+
+Imagine a company requires:
+
+```text
+2 security guards per gate.
+```
+
+Every gate currently has:
+
+```text
+2 guards
+```
+
+One guard suddenly leaves.
+
+Now one gate has:
+
+```text
+1 guard
+```
+
+To indicate the shortage, management marks that gate:
+
+```text
+"Needs One More Guard"
+```
+
+This temporary warning label is like Double Black.
+
+The gate itself is not special.
+
+It simply indicates:
+
+```text
+A missing black node.
+```
+
+The tree then redistributes guards (rotations/recoloring) until every gate again has the required number.
+
+---
+
+## Exercise 5: Simulate Complete Deletion
+
+Initial Tree:
+
+```text
+            20(B)
+           /     \
+        10(B)   30(B)
+                 \
+                 40(R)
+```
+
+Delete:
+
+```text
+10(B)
+```
+
+---
+
+### Step 1
+
+Create Double Black:
+
+```text
+            20(B)
+           /     \
+         DB     30(B)
+                  \
+                  40(R)
+```
+
+---
+
+### Step 2
+
+Sibling:
+
+```text
+30(B)
+```
+
+Far child:
+
+```text
+40(R)
+```
+
+Case 4 detected.
+
+---
+
+### Step 3
+
+Left Rotation around 20
+
+```text
+            30(B)
+           /     \
+        20(B)   40(B)
+```
+
+---
+
+### Step 4
+
+Double Black disappears.
+
+Tree satisfies all Red-Black properties.
+
+Deletion complete.
+
+---
+
+# Interview Quick Revision
+
+### When No Fix is Needed
+
+```text
+Delete RED node
+Delete node with RED child
+```
+
+---
+
+### When Double Black Appears
+
+```text
+Delete BLACK leaf
+Delete BLACK node replaced by NULL
+```
+
+---
+
+### Four Deletion Cases
+
+```text
+1. Red Sibling
+2. Black Sibling + Black Children
+3. Black Sibling + Near Child Red
+4. Black Sibling + Far Child Red
+```
+
+---
+
+### Case That Ends Immediately
+
+```text
+Case 4
+```
+
+---
+
+### Case That Moves Upward
+
+```text
+Case 2
+```
+
+---
+
+### Most Important Node During Deletion
+
+```text
+Sibling
+```
+
+---
+
+### Most Important Concept
+
+```text
+Double Black
+```
+
+because every deletion fix-up is ultimately about removing the Double Black while maintaining Black Height.
