@@ -1,0 +1,948 @@
+# Red-Black Tree Complete Notes
+
+# Module 6: Red-Black Tree Deletion
+
+# Double Black Concept, Cases & Intuition
+
+---
+
+# Learning Objectives
+
+By the end of this module, you will understand:
+
+* Why deletion is harder than insertion
+* Why Red-Black deletion is considered one of the hardest tree algorithms
+* The Double Black concept
+* How deletion affects black height
+* Sibling-based deletion cases
+* Recoloring and rotation logic
+* Interview-level understanding of deletion
+
+---
+
+# 1. Why Is Red-Black Deletion Hard?
+
+Interview Question:
+
+> Which is harder: Red-Black insertion or Red-Black deletion?
+
+Answer:
+
+```text id="n4bxh1"
+Red-Black Deletion
+```
+
+---
+
+# Why?
+
+Insertion usually breaks:
+
+```text id="pwgjvt"
+Property 4
+(No consecutive RED nodes)
+```
+
+Only one major property.
+
+---
+
+Deletion can break:
+
+```text id="s52jq5"
+Property 2
+Property 4
+Property 5
+```
+
+especially:
+
+```text id="v7b8b3"
+Black Height
+```
+
+---
+
+# The Real Problem
+
+Insertion:
+
+```text id="lmepmh"
+Adds a RED node
+```
+
+RED nodes do not affect black height.
+
+Easy.
+
+---
+
+Deletion:
+
+May remove:
+
+```text id="s99l3x"
+BLACK node
+```
+
+This changes black height.
+
+Dangerous.
+
+---
+
+# 2. Understanding the Black Height Problem
+
+Consider:
+
+```text id="qf55dz"
+        B
+       / \
+      B   B
+```
+
+Valid.
+
+---
+
+Black height:
+
+Left path:
+
+```text id="vr7ccf"
+2
+```
+
+Right path:
+
+```text id="36e3aj"
+2
+```
+
+Balanced.
+
+---
+
+Delete left BLACK node:
+
+```text id="8hxxlq"
+        B
+          \
+           B
+```
+
+Now:
+
+Left path:
+
+```text id="2dw1qa"
+1
+```
+
+Right path:
+
+```text id="v8v6dr"
+2
+```
+
+Property 5 violated.
+
+---
+
+# Key Insight
+
+Deleting BLACK node creates:
+
+```text id="4mjlwm"
+Black Deficiency
+```
+
+One side has fewer black nodes.
+
+We must repair it.
+
+---
+
+# 3. The Double Black Concept
+
+This is the most important deletion idea.
+
+---
+
+Imagine:
+
+```text id="7rvvru"
+BLACK node removed
+```
+
+Instead of thinking:
+
+```text id="6e4vr9"
+One black disappeared
+```
+
+we think:
+
+```text id="4efiqv"
+Child inherits extra blackness
+```
+
+This extra blackness is called:
+
+```text id="mj0xql"
+DOUBLE BLACK
+```
+
+---
+
+# Why Invent Double Black?
+
+Without it:
+
+Balancing becomes extremely difficult.
+
+Double Black allows us to:
+
+```text id="jlwmr8"
+Track missing black height
+```
+
+during repair.
+
+---
+
+# Example
+
+Original:
+
+```text id="ffy7yf"
+      B
+     /
+    B
+```
+
+Delete lower BLACK node.
+
+Instead of:
+
+```text id="mjlwmh"
+Black count decreased
+```
+
+Think:
+
+```text id="5ysgcu"
+NIL becomes Double Black
+```
+
+Representation:
+
+```text id="0urx8q"
+      B
+     /
+   DB
+```
+
+(DB = Double Black)
+
+---
+
+# Goal of Deletion
+
+Remove:
+
+```text id="s1sqk0"
+Double Black
+```
+
+without violating Red-Black properties.
+
+---
+
+# 4. Cases Based on Sibling
+
+Insertion focused on:
+
+```text id="m2ezjk"
+Uncle
+```
+
+Deletion focuses on:
+
+```text id="8ztg4y"
+Sibling
+```
+
+---
+
+Important relatives:
+
+```text id="w34kdl"
+Node (Double Black)
+
+Parent
+
+Sibling
+```
+
+---
+
+Example:
+
+```text id="1uym4f"
+        P
+       / \
+     DB   S
+```
+
+S:
+
+```text id="mjlwmu"
+Sibling
+```
+
+---
+
+Almost every deletion case depends on sibling color.
+
+---
+
+# 5. Case 1: Sibling is RED
+
+This is easiest to recognize.
+
+---
+
+Example
+
+```text id="6gx4mh"
+         B
+        / \
+      DB   R
+          / \
+         B   B
+```
+
+Sibling:
+
+```text id="f0kv1z"
+RED
+```
+
+---
+
+Observation
+
+Red sibling means:
+
+```text id="8rzv9w"
+Parent must be BLACK
+```
+
+because two consecutive reds are forbidden.
+
+---
+
+Fix
+
+Swap colors:
+
+```text id="q4e9gc"
+Parent ↔ Sibling
+```
+
+Then rotate.
+
+---
+
+After rotation:
+
+Sibling becomes parent.
+
+Tree transforms into a case where sibling is BLACK.
+
+---
+
+# Why?
+
+Case 1 is never the final solution.
+
+It converts the tree into another deletion case.
+
+---
+
+# Interview Shortcut
+
+```text id="jlwmrw"
+RED sibling
+=
+Transform problem
+```
+
+Not solve problem.
+
+---
+
+# 6. Case 2: Sibling BLACK with Two BLACK Children
+
+Example:
+
+```text id="9a9x0e"
+          P
+         / \
+       DB   B
+           / \
+          B   B
+```
+
+Sibling:
+
+```text id="f0l02k"
+BLACK
+```
+
+Children:
+
+```text id="ub0e7r"
+BLACK
+BLACK
+```
+
+---
+
+Fix
+
+Color sibling RED.
+
+```text id="w15yhs"
+          P
+         / \
+       DB   R
+```
+
+---
+
+Effect
+
+Sibling loses one black.
+
+Double Black moves upward.
+
+Now:
+
+```text id="5tvq5w"
+Parent becomes Double Black
+```
+
+---
+
+This is called:
+
+```text id="jlwmrx"
+Push Double Black Upward
+```
+
+---
+
+# Why?
+
+No rotation needed.
+
+Only recoloring.
+
+---
+
+# Important Insight
+
+Deletion can propagate upward.
+
+Insertion usually stops quickly.
+
+Deletion may continue all the way to root.
+
+---
+
+# 7. Case 3: Sibling BLACK
+
+# Near Child RED
+
+# Far Child BLACK
+
+This is the most confusing case.
+
+---
+
+Assume:
+
+```text id="7dxk7r"
+DB on left side
+```
+
+Example:
+
+```text id="4o0w9k"
+           P
+          / \
+        DB   B
+            /
+           R
+```
+
+---
+
+Sibling:
+
+```text id="53t0f7"
+BLACK
+```
+
+Near child:
+
+```text id="jlwms0"
+RED
+```
+
+Far child:
+
+```text id="jlwms1"
+BLACK
+```
+
+---
+
+Fix
+
+Rotate sibling.
+
+Recolor.
+
+Transform into Case 4.
+
+---
+
+# Important
+
+Case 3 never directly solves deletion.
+
+It prepares for Case 4.
+
+---
+
+# Memory Trick
+
+```text id="jlwms2"
+Case 3
+=
+Preparation Case
+```
+
+---
+
+# 8. Case 4: Sibling BLACK
+
+# Far Child RED
+
+This is the final solving case.
+
+---
+
+Example
+
+```text id="jlwms3"
+           P
+          / \
+        DB   B
+              \
+               R
+```
+
+---
+
+Sibling:
+
+```text id="jlwms4"
+BLACK
+```
+
+Far child:
+
+```text id="jlwms5"
+RED
+```
+
+---
+
+Fix
+
+Rotate parent.
+
+Recolor.
+
+Remove Double Black.
+
+---
+
+Result
+
+All properties restored.
+
+Deletion ends.
+
+---
+
+# Memory Trick
+
+```text id="jlwms6"
+Far RED Child
+=
+Problem Solved
+```
+
+---
+
+# 9. Left and Right Symmetry
+
+Everything discussed assumed:
+
+```text id="jlwms7"
+Double Black on left
+```
+
+---
+
+If Double Black is on right:
+
+Mirror all cases.
+
+---
+
+Interview Tip:
+
+Learn only one side.
+
+Mirror mentally.
+
+---
+
+# 10. Why Does Double Black Work?
+
+Suppose:
+
+```text id="jlwms8"
+Black node removed
+```
+
+Missing:
+
+```text id="jlwms9"
+1 black
+```
+
+Double Black represents:
+
+```text id="jlwmta"
+Extra black requirement
+```
+
+that must be redistributed.
+
+---
+
+Think of it as:
+
+```text id="jlwmtb"
+Debt
+```
+
+Tree owes one black node.
+
+Deletion fixes the debt.
+
+---
+
+# 11. Visual Summary
+
+---
+
+Delete node.
+
+---
+
+Deleted node color?
+
+```text id="jlwmtc"
+RED
+```
+
+Done.
+
+Easy.
+
+---
+
+Deleted node color?
+
+```text id="jlwmtd"
+BLACK
+```
+
+Create:
+
+```text id="ljive"
+Double Black
+```
+
+---
+
+Check sibling.
+
+---
+
+Sibling RED?
+
+```text id="jlwmtf"
+Rotate
+Recolor
+Convert case
+```
+
+---
+
+Sibling BLACK + Two BLACK Children?
+
+```text id="jlwmtg"
+Push Double Black Up
+```
+
+---
+
+Sibling BLACK + Near RED Child?
+
+```text id="jlwmth"
+Convert to Case 4
+```
+
+---
+
+Sibling BLACK + Far RED Child?
+
+```text id="jlwmti"
+Rotate
+Recolor
+Done
+```
+
+---
+
+# 12. Why Deletion is O(log n)
+
+Search node:
+
+```text id="jlvmtj"
+O(log n)
+```
+
+---
+
+Double Black propagation:
+
+```text id="jlvmtk"
+At most root height
+```
+
+---
+
+Height:
+
+```text id="jlvmtl"
+O(log n)
+```
+
+---
+
+Rotations:
+
+```text id="jlvmtm"
+O(1)
+```
+
+---
+
+Total:
+
+```text id="jlvmtn"
+Deletion = O(log n)
+```
+
+---
+
+# AVL vs Red-Black Deletion
+
+| Feature      | AVL              | Red-Black              |
+| ------------ | ---------------- | ---------------------- |
+| Main Problem | Height imbalance | Black height imbalance |
+| Concept      | Balance Factor   | Double Black           |
+| Rotations    | Several          | Fewer                  |
+| Complexity   | O(log n)         | O(log n)               |
+| Difficulty   | High             | Very High              |
+
+---
+
+# Interview Questions
+
+---
+
+## Q1
+
+Why is Red-Black deletion harder than insertion?
+
+### Answer
+
+Deletion can violate black height and create Double Black situations.
+
+---
+
+## Q2
+
+What is Double Black?
+
+### Answer
+
+A conceptual state representing a missing black node after deletion.
+
+---
+
+## Q3
+
+Which relative is most important during deletion?
+
+### Answer
+
+Sibling.
+
+---
+
+## Q4
+
+What happens when sibling is RED?
+
+### Answer
+
+Rotate and recolor to transform into another case.
+
+---
+
+## Q5
+
+What happens when sibling is BLACK with two BLACK children?
+
+### Answer
+
+Push Double Black upward.
+
+---
+
+## Q6
+
+Which case actually resolves Double Black?
+
+### Answer
+
+Case 4 (BLACK sibling with far RED child).
+
+---
+
+# Common Mistakes
+
+### Mistake 1
+
+Trying to memorize deletion without understanding Double Black.
+
+---
+
+### Mistake 2
+
+Confusing near child and far child.
+
+---
+
+### Mistake 3
+
+Thinking Case 1 solves deletion.
+
+It only transforms the problem.
+
+---
+
+### Mistake 4
+
+Not recognizing mirror cases.
+
+---
+
+# Trainer Notes
+
+Teach deletion in this order:
+
+1. Black height problem
+2. Missing black node
+3. Double Black
+4. Sibling concept
+5. Four sibling cases
+6. Rotations and recoloring
+
+Never start with code.
+
+Students will only memorize.
+
+---
+
+# Module Summary
+
+Deletion is difficult because removing a BLACK node changes:
+
+```text id="jlwmto"
+Black Height
+```
+
+To track the missing black node we create:
+
+```text id="jlwmtp"
+Double Black
+```
+
+Deletion repair revolves around:
+
+```text id="jlwmtq"
+Sibling
+```
+
+Cases:
+
+```text id="jlwmtr"
+Sibling RED
+
+Sibling BLACK + BLACK Children
+
+Sibling BLACK + Near RED Child
+
+Sibling BLACK + Far RED Child
+```
+
+These cases eventually eliminate Double Black and restore all Red-Black properties.
+
+'''
+Conceptual Questions
+Why is deletion harder than insertion?
+What is Double Black?
+Why does deleting a RED node usually require no fix?
+Why is sibling more important than uncle during deletion?
+Which deletion case actually resolves the problem?
+Why can deletion propagate upward?
+Coding Exercises
+Draw all four sibling cases.
+Trace deletion manually on paper.
+Identify near child vs far child.
+Explain Double Black to someone without using code.
+Simulate deletion from a Red-Black Tree step by step.
+'''
